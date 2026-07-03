@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model User {
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  role               Role      @default(USER)
+  name               String
+  password           String
+  refreshToken       String?
+  resetPasswordToken String?
+  resetPasswordExp   DateTime?
+  resetSessionExpiry DateTime?
+  resetSessionToken  String?
+  tokenAttempts      Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  cart               Cart?
+
+  orders Order[]
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  stock       Int
+  imageUrl    String
+  imageId     String
+  cartItems   CartItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String?    @unique
+  user      User?      @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  subtotal  Float      @default(0)
+  total     Float      @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  lineTotal Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+}
+
+model Order {
+  id     String      @id @default(uuid())
+  userId String
+  status OrderStatus @default(PENDING)
+
+  subtotal    Decimal
+  tax         Decimal @default(0)
+  shippingFee Decimal @default(0)
+  discount    Decimal @default(0)
+  total       Decimal
+
+  paymentMethod  String? // "STRIPE", "PAYSTACK"
+  transactionId  String? // Mock external payment ID
+  trackingNumber String? // Mock shipping tracking ID
+
+  shippingName    String
+  shippingAddress String
+  shippingCity    String
+  shippingCountry String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+
+  price Decimal
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
