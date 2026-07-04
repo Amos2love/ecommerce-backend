@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "./lib/prisma";
 
 import app from "./app";
 import { Redis } from '@upstash/redis';
@@ -7,7 +7,7 @@ import { Redis } from '@upstash/redis';
 
 dotenv.config();
 
-const prisma = new PrismaClient();
+
 
 // Initialize Upstash Redis Client
 export const redis = new Redis({
