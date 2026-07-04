@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Application, Request, Response } from 'express';
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes";
@@ -9,10 +9,14 @@ import PaymentRouter from "./routes/payment.routes";
 import swaggerJSDoc, { Options } from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
-const app = express();
+const app:Application = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date() });
+});
 
 app.use(
   cors({

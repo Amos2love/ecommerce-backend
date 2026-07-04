@@ -1,21 +1,40 @@
 import dotenv from "dotenv";
+import { PrismaClient } from "./generated/prisma/client"
+
 import app from "./app";
+import { Redis } from '@upstash/redis';
 import { connectRedis } from "./utils/redis";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
+
+const prisma = new PrismaClient();
+
+
+// Initialize Upstash Redis Client
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || '',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+});
+
+// Koyeb injects a dynamic PORT variable. Fallback to 3000 for local development.
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const HOST = '0.0.0.0'
 
 const startServer = async () => {
   try {
     // 1. Connect to Redis 
-    await connectRedis();
-    console.log("✅ Redis successfully connected");
+   await redis.ping();
+    console.log("✅ Redis successfully authenticated");
+
+    // Test Database Connection
+    await prisma.$connect();
+    console.log('Successfully connected to Neon Database.');
 
     // 2. Start the Express server SECOND
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+   app.listen(PORT, HOST, () => {
+  console.log(`Server is running on ${HOST}:${PORT}`);
+});
   } catch (error) {
     console.error("❌ Failed to start server:", error);
     process.exit(1); 
