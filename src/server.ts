@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { PrismaClient } from "./generated/prisma"; 
+import { PrismaClient } from '@prisma/client';
 
 import app from "./app";
 import { Redis } from '@upstash/redis';
