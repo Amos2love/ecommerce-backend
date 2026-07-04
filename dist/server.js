@@ -5,12 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.redis = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
-const prisma_1 = require("./generated/prisma");
+const client_1 = require("@prisma/client");
 const app_1 = __importDefault(require("./app"));
 const redis_1 = require("@upstash/redis");
 // 2. Removed the connectRedis import so it doesn't crash looking for a missing file
 dotenv_1.default.config();
-const prisma = new prisma_1.PrismaClient();
+const prisma = new client_1.PrismaClient();
 // Initialize Upstash Redis Client
 exports.redis = new redis_1.Redis({
     url: process.env.UPSTASH_REDIS_REST_URL || '',

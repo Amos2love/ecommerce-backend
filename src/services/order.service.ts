@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { Prisma,OrderStatus } from "../generated/prisma";
+import {OrderStatus,Prisma } from "@prisma/client";
 
 interface ShippingDetails {
   shippingName: string;

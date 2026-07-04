@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { OrderParams } from "../types/order";
-import { OrderStatus } from "../generated/prisma";
+import { OrderStatus } from "@prisma/client";
 
 import {
   createOrder,

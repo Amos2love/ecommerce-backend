@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "@prisma/client"
 import redis  from "../utils/redis";
 
 export interface NormalizedProduct {
