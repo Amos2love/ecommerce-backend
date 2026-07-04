@@ -17,7 +17,7 @@ export const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
 });
 
-// Koyeb injects a dynamic PORT variable. Fallback to 3000 for local development.
+
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const HOST = '0.0.0.0'
 

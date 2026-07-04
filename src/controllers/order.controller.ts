@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { Request, Response, RequestHandler } from "express";
 import { OrderParams } from "../types/order";
+import { OrderStatus } from "../generated/prisma";
 
 import {
   createOrder,
@@ -47,7 +48,7 @@ export const createOrderController = async (
 };
 
 export const getUserOrdersController = async (
-  req: Request,
+  req: Request<{ userId: string }>,
   res: Response
 ) => {
   try {
@@ -116,8 +117,10 @@ export const updateOrderStatusController = async (
   req: Request<OrderParams>,
   res: Response
 ) => {
+  
   try {
-    const { status, transactionId, trackingNumber } = req.body;
+    const status = req.body.status as OrderStatus;
+    const { transactionId, trackingNumber } = req.body;
 
     if (!status) {
       return res.status(400).json({
@@ -150,7 +153,7 @@ export const updateOrderStatusController = async (
   }
 };
 
-export const deleteOrderController = async (
+export const deleteOrderController:RequestHandler<OrderParams> = async (
   req: Request<OrderParams>,
   res: Response
 ) => {

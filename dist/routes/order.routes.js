@@ -1,55 +1,21 @@
-import { Router } from "express";
-import { OrderParams } from '../types/order';
-import {
-  createOrderController,
-  getUserOrdersController,
-  getSingleOrderController,
-  updateOrderStatusController,
-  deleteOrderController,
-} from "../controllers/order.controller";
-
-import { authMiddleware } from "../middlewares/auth.middleware";
-
-const OrderRouter = Router();
-
-OrderRouter.post(
-  "/",
-  authMiddleware,
-  createOrderController
-);
-
-OrderRouter.get(
-  "/user/:userId",
-  authMiddleware,
-  getUserOrdersController
-);
-
-OrderRouter.get(
-  "/:id",
-  authMiddleware,
-  getSingleOrderController
-);
-
-OrderRouter.patch<OrderParams>(
-  "/:id/status",
-  authMiddleware,
-  updateOrderStatusController
-);
-
-OrderRouter.delete<OrderParams>(
-  "/:id",
-  authMiddleware,
-  deleteOrderController
-);
-
-export default OrderRouter;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const order_controller_1 = require("../controllers/order.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const OrderRouter = (0, express_1.Router)();
+OrderRouter.post("/", auth_middleware_1.authMiddleware, order_controller_1.createOrderController);
+OrderRouter.get("/user/:userId", auth_middleware_1.authMiddleware, order_controller_1.getUserOrdersController);
+OrderRouter.get("/:id", auth_middleware_1.authMiddleware, order_controller_1.getSingleOrderController);
+OrderRouter.patch("/:id/status", auth_middleware_1.authMiddleware, order_controller_1.updateOrderStatusController);
+OrderRouter.delete("/:id", auth_middleware_1.authMiddleware, order_controller_1.deleteOrderController);
+exports.default = OrderRouter;
 /**
  * @swagger
  * tags:
  *   - name: Orders
  *     description: Order creation and management
  */
-
 /**
  * @swagger
  * /api/order:
@@ -88,7 +54,6 @@ export default OrderRouter;
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-
 /**
  * @swagger
  * /api/order/user/{userId}:
@@ -119,7 +84,6 @@ export default OrderRouter;
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-
 /**
  * @swagger
  * /api/order/{id}:
@@ -148,7 +112,6 @@ export default OrderRouter;
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-
 /**
  * @swagger
  * /api/order/{id}/status:
@@ -188,7 +151,6 @@ export default OrderRouter;
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-
 /**
  * @swagger
  * /api/order/{id}:
@@ -212,4 +174,4 @@ export default OrderRouter;
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
- */
+ */ 

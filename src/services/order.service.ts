@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import { Prisma,OrderStatus } from "../generated/prisma";
 
 interface ShippingDetails {
   shippingName: string;
@@ -140,7 +141,7 @@ export async function getUserOrders(userId: string) {
 
 export async function updateOrderStatus(
   orderId: string,
-  status: string,
+  status:OrderStatus,
   transactionId?: string,
   trackingNumber?: string
 ) {

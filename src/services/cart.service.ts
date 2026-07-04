@@ -29,9 +29,13 @@ const CART_EXPIRATION_SECONDS = 60 * 60 * 24 * 7;
 
 export const getOrCreateCart = async (params: {
   userId?: string;
-  sessionId: string;
+  sessionId?: string;
 }): Promise<NormalizedCart> => { // <-- Force the return type
   const { userId, sessionId } = params;
+
+  if (!userId && !sessionId) {
+    throw new Error("Session ID required");
+  }
 
   // ==========================================
   // PATH A: UNAUTHENTICATED GUEST (REDIS)
@@ -89,14 +93,14 @@ export const getOrCreateCart = async (params: {
     items: dbCart.items.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
-      price: Number(item.price), 
+      price: Number(item.price),
       lineTotal: Number(item.lineTotal),
       product: {
         id: item.product.id,
-        name: item.product.title,
+        title: item.product.title,
         description: item.product.description,
         imageUrl: item.product.imageUrl,
-      }
+      },
     })),
     subtotal: Number(dbCart.subtotal),
     total: Number(dbCart.total),
@@ -181,10 +185,10 @@ export const addToCart = async (
         lineTotal: Number(product.price) * quantity,
         product: {
           id: product.id,
-          name: product.title,
-          description:product.description,
-           imageUrl: product.imageUrl 
-        }
+          title: product.title,
+          description: product.description,
+          imageUrl: product.imageUrl,
+        },
       };
       cart.items.push(addedOrUpdatedItem);
     }
@@ -277,9 +281,10 @@ export const addToCart = async (
       lineTotal: Number(cartItem.lineTotal),
       product: {
         id: cartItem.product.id,
-        name: cartItem.product.title,
-        // imageUrl: cartItem.product.imageUrl
-      }
+        title: cartItem.product.title,
+        description: cartItem.product.description,
+        imageUrl: cartItem.product.imageUrl,
+      },
     };
   }
 
@@ -449,8 +454,8 @@ export const updateCartItem = async (
         id: result.product.id,
         title: result.product.title,
         description: result.product.description,
-        imageUrl: result.product.imageUrl
-      }
+        imageUrl: result.product.imageUrl,
+      },
     };
   }
 

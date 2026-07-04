@@ -3,7 +3,7 @@ import { initializeFlutterwavePayment } from "../services/payment.service";
 import { getOrderById, updateOrderStatus } from "../services/order.service";
 
 // --- 1. THE CHECKOUT CONTROLLER ---
-export const initiateCheckoutController = async (req: Request, res: Response) => {
+export const initiateCheckoutController = async (req: Request<{ orderId: string }>, res: Response) => {
   try {
     const { orderId } = req.params;
 

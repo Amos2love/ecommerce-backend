@@ -9,9 +9,14 @@ import {
 
 // helper: unify user/session extraction
 const getContext = (req: Request) => {
+  const rawSessionId = req.headers["x-session-id"];
+  const sessionId: string | undefined = Array.isArray(rawSessionId)
+    ? rawSessionId[0]
+    : rawSessionId;
+
   return {
     userId: (req as any).user?.userId || undefined,
-    sessionId: req.headers["x-session-id"] as string | undefined,
+    sessionId,
   };
 };
 
@@ -58,6 +63,7 @@ export const addToCartController = async (req: Request, res: Response) => {
 export const updateCartItemController = async (req: Request, res: Response) => {
   try {
     const { userId, sessionId } = getContext(req);
+    const normalizedSessionId = typeof sessionId === "string" ? sessionId : undefined;
     const { productId } = req.params;
     const { quantity } = req.body;
 
@@ -65,7 +71,7 @@ export const updateCartItemController = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "productId required" });
     }
 
-    const item = await updateCartItem(productId, quantity, sessionId, userId);
+    const item = await updateCartItem(productId as string, quantity, normalizedSessionId, userId);
 
     return res.json(item);
   } catch (err: any) {
@@ -77,13 +83,14 @@ export const updateCartItemController = async (req: Request, res: Response) => {
 export const removeCartItemController = async (req: Request, res: Response) => {
   try {
     const { userId, sessionId } = getContext(req);
+    const normalizedSessionId = typeof sessionId === "string" ? sessionId : undefined;
     const { productId } = req.params;
 
     if (!productId) {
       return res.status(400).json({ message: "productId required" });
     }
 
-    await removeCartItem(productId, sessionId, userId);
+    await removeCartItem(productId as string, normalizedSessionId, userId);
 
     return res.json({ success: true });
   } catch (err: any) {

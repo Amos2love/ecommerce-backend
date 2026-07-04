@@ -1,0 +1,136 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const cart_controller_1 = require("../controllers/cart.controller");
+const cart_middleware_1 = require("../middlewares/cart.middleware");
+const CartRouter = (0, express_1.Router)();
+CartRouter.get("/", cart_middleware_1.cartMiddleware, cart_controller_1.getCartController);
+CartRouter.post("/items", cart_middleware_1.cartMiddleware, cart_controller_1.addToCartController);
+CartRouter.patch("/items/:productId", cart_middleware_1.cartMiddleware, cart_controller_1.updateCartItemController);
+CartRouter.delete("/items/:productId", cart_middleware_1.cartMiddleware, cart_controller_1.removeCartItemController);
+CartRouter.post("/merge", cart_middleware_1.cartMiddleware, cart_controller_1.mergeCartController);
+exports.default = CartRouter;
+/**
+ * @swagger
+ * tags:
+ *   - name: Cart
+ *     description: Shopping cart endpoints
+ */
+/**
+ * @swagger
+ * /api/cart:
+ *   get:
+ *     tags: [Cart]
+ *     summary: Get the current cart (guest or user)
+ *     responses:
+ *       200:
+ *         description: Cart object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cart'
+ *       404:
+ *         description: Cart not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ * */
+/**
+ * @swagger
+ * /api/cart/items:
+ *   post:
+ *     tags: [Cart]
+ *     summary: Add an item to the cart
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: string
+ *               quantity:
+ *                 type: integer
+ *             required: [productId, quantity]
+ *     responses:
+ *       201:
+ *         description: Item added
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cart'
+ */
+/**
+ * @swagger
+ * /api/cart/items/{productId}:
+ *   patch:
+ *     tags: [Cart]
+ *     summary: Update quantity for a cart item
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               quantity:
+ *                 type: integer
+ *             required: [quantity]
+ *     responses:
+ *       200:
+ *         description: Item updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cart'
+ *       404:
+ *         description: Item not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+/**
+ * @swagger
+ * /api/cart/items/{productId}:
+ *   delete:
+ *     tags: [Cart]
+ *     summary: Remove an item from the cart
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Item removed
+ *       404:
+ *         description: Item not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+/**
+ * @swagger
+ * /api/cart/merge:
+ *   post:
+ *     tags: [Cart]
+ *     summary: Merge guest cart with user cart after signin
+ *     responses:
+ *       200:
+ *         description: Carts merged
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Cart'
+ */ 

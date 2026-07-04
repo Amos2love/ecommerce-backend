@@ -4,6 +4,7 @@ import { generateToken,generateRefreshToken } from "../utils/jwt";
 import { sendEmail } from "../utils/mail";
 import {generate6DigitToken} from "../utils/token";
 import Jwt  from "jsonwebtoken";
+import { mergeGuestCartIntoUserCart } from "../services/cart.service";
 
 export const SignupService = async (email:string,password:string,name:string)=>{
     const existingUser= await prisma.user.findUnique({where:{email},})
@@ -58,7 +59,7 @@ export const SigninService = async (
   }
 
   if (sessionId) {
-    await mergeCarts(
+    await mergeGuestCartIntoUserCart(
       sessionId,
       user.id
     );
