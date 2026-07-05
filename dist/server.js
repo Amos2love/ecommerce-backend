@@ -4,31 +4,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.redis = void 0;
-const dotenv_1 = __importDefault(require("dotenv"));
-const client_1 = require("@prisma/client");
+require("dotenv/config");
 const app_1 = __importDefault(require("./app"));
+const prisma_1 = require("./lib/prisma");
 const redis_1 = require("@upstash/redis");
-// 2. Removed the connectRedis import so it doesn't crash looking for a missing file
-dotenv_1.default.config();
-const prisma = new client_1.PrismaClient();
-// Initialize Upstash Redis Client
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+if (!redisUrl || !redisToken) {
+    throw new Error("Missing Upstash Redis environment variables");
+}
 exports.redis = new redis_1.Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL || '',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+    url: redisUrl,
+    token: redisToken,
 });
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-const HOST = '0.0.0.0'; // Correctly configured for Render
+const PORT = Number(process.env.PORT) || 3000;
 const startServer = async () => {
     try {
-        // 1. Connect to Redis 
+        // Test Redis Connection
         await exports.redis.ping();
         console.log("✅ Redis successfully authenticated");
         // Test Database Connection
-        await prisma.$connect();
-        console.log('✅ Successfully connected to Neon Database.');
-        // 2. Start the Express server SECOND
-        app_1.default.listen(PORT, HOST, () => {
-            console.log(`🚀 Server is running on ${HOST}:${PORT}`);
+        await prisma_1.prisma.$connect();
+        console.log("✅ Successfully connected to Neon Database");
+        // Start Server
+        app_1.default.listen(PORT, () => {
+            console.log(`🚀 Server is running on port ${PORT}`);
         });
     }
     catch (error) {
@@ -36,5 +36,12 @@ const startServer = async () => {
         process.exit(1);
     }
 };
-// Execute the startup sequence
+process.on("SIGTERM", async () => {
+    await prisma_1.prisma.$disconnect();
+    process.exit(0);
+});
+process.on("SIGINT", async () => {
+    await prisma_1.prisma.$disconnect();
+    process.exit(0);
+});
 startServer();

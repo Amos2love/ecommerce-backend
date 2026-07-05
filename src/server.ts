@@ -1,42 +1,51 @@
-import dotenv from "dotenv";
-import { prisma } from "./lib/prisma";
+import "dotenv/config";
 
 import app from "./app";
-import { Redis } from '@upstash/redis';
-// 2. Removed the connectRedis import so it doesn't crash looking for a missing file
+import { prisma } from "./lib/prisma";
+import { Redis } from "@upstash/redis";
 
-dotenv.config();
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
+if (!redisUrl || !redisToken) {
+  throw new Error("Missing Upstash Redis environment variables");
+}
 
-
-// Initialize Upstash Redis Client
 export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+  url: redisUrl,
+  token: redisToken,
 });
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-const HOST = '0.0.0.0'; // Correctly configured for Render
+const PORT = Number(process.env.PORT) || 3000;
 
 const startServer = async () => {
   try {
-    // 1. Connect to Redis 
+    // Test Redis Connection
     await redis.ping();
     console.log("✅ Redis successfully authenticated");
 
     // Test Database Connection
     await prisma.$connect();
-    console.log('✅ Successfully connected to Neon Database.');
+    console.log("✅ Successfully connected to Neon Database");
 
-    // 2. Start the Express server SECOND
-    app.listen(PORT, HOST, () => {
-      console.log(`🚀 Server is running on ${HOST}:${PORT}`);
+    // Start Server
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
-    process.exit(1); 
+    process.exit(1);
   }
 };
 
-// Execute the startup sequence
+process.on("SIGTERM", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
 startServer();
