@@ -31,7 +31,7 @@ npm run dev
 
 4. Open API docs
 
-Visit `http://localhost:5000/api-docs`
+Visit `http://localhost:3000/api-docs`
 
 ## Useful commands
 
