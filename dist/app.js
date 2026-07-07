@@ -37,8 +37,8 @@ const swaggerOptions = {
         servers: [
             {
                 // You can use process.env.PORT here if you have one set up
-                url: `http://localhost:${process.env.PORT}`,
-                description: "Development Server"
+                url: process.env.API_URL || "http://localhost:3000",
+                description: "Server",
             },
         ],
         components: {
@@ -188,7 +188,9 @@ const swaggerOptions = {
             },
         },
     },
-    apis: ["./src/routes/*.ts"],
+    apis: process.env.NODE_ENV === "production"
+        ? ["./dist/routes/*.js"]
+        : ["./src/routes/*.ts"],
 };
 const swaggerDocs = (0, swagger_jsdoc_1.default)(swaggerOptions);
 // Serve the documentation UI
