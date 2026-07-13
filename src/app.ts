@@ -1,4 +1,5 @@
 import express, { Application, Request, Response } from 'express';
+import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes";
@@ -195,10 +196,10 @@ const swaggerOptions: Options = {
       },
     },
   },
-  apis:
-  process.env.NODE_ENV === "production"
-   ? ["./dist/routes/*.js"]
-    : ["./src/routes/*.ts"] 
+ apis: [
+    path.join(__dirname, "./routes/*.ts"), 
+    path.join(__dirname, "./routes/*.js")
+  ], 
 };
 
 app.get("/swagger.json", (req, res) => {
@@ -210,7 +211,15 @@ app.get("/swagger.json", (req, res) => {
 const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 // Serve the documentation UI
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(undefined, {
+    swaggerOptions: {
+      url: "/swagger.json",
+    },
+  })
+);
 // ==========================================
 
 // Application Routes

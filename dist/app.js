@@ -190,8 +190,11 @@ const swaggerOptions = {
     },
     apis: process.env.NODE_ENV === "production"
         ? ["./dist/routes/*.js"]
-        : ["./src/routes/*.ts"],
+        : ["./src/routes/*.ts"]
 };
+app.get("/swagger.json", (req, res) => {
+    res.json(swaggerDocs);
+});
 const swaggerDocs = (0, swagger_jsdoc_1.default)(swaggerOptions);
 // Serve the documentation UI
 app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocs));
