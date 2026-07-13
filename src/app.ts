@@ -35,6 +35,7 @@ const swaggerOptions: Options = {
       title: "E-commerce API",
       version: "1.0.0",
       description: "API documentation for my backend endpoints",
+      apis: ['./src/**/*.ts', './dist/**/*.js', './build/**/*.js']
     },
     servers: [
       {
