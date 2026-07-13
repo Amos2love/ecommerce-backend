@@ -35,7 +35,6 @@ const swaggerOptions: Options = {
       title: "E-commerce API",
       version: "1.0.0",
       description: "API documentation for my backend endpoints",
-      apis: ['./src/**/*.ts', './dist/**/*.js', './build/**/*.js']
     },
     servers: [
       {
@@ -198,9 +197,15 @@ const swaggerOptions: Options = {
   },
   apis:
   process.env.NODE_ENV === "production"
-    ? ["./dist/routes/*.js"]
-    : ["./src/routes/*.ts"], 
+   ? ["./dist/routes/*.js"]
+    : ["./src/routes/*.ts"] 
 };
+
+app.get("/swagger.json", (req, res) => {
+  res.json(swaggerDocs);
+});
+
+
 
 const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
@@ -214,5 +219,7 @@ app.use("/api/product", productRouter);
 app.use("/api/cart", CartRouter);
 app.use("/api/payments", PaymentRouter);
 app.use("/api/order", OrderRouter);
+
+
 
 export default app;
