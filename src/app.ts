@@ -39,10 +39,9 @@ const swaggerOptions: Options = {
     },
     servers: [
       {
-        // You can use process.env.PORT here if you have one set up
-          url: process.env.API_URL || "http://localhost:3000",
-          description: "Server",
-
+        // Use relative path as fallback so it works seamlessly on Render
+        url: process.env.API_URL || "/",
+        description: "API Server",
       },
     ],
     components: {
@@ -214,11 +213,7 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions);
 app.use(
   "/api-docs",
   swaggerUi.serve,
-  swaggerUi.setup(undefined, {
-    swaggerOptions: {
-      url: "/swagger.json",
-    },
-  })
+  swaggerUi.setup(swaggerDocs)
 );
 // ==========================================
 
