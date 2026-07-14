@@ -19,15 +19,9 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', timestamp: new Date() });
 });
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  })
-);
-
 // ==========================================
 // SWAGGER CONFIGURATION
+// (Mounted BEFORE CORS so the docs UI is accessible from any origin)
 // ==========================================
 const swaggerOptions: Options = {
   swaggerDefinition: {
@@ -39,7 +33,6 @@ const swaggerOptions: Options = {
     },
     servers: [
       {
-        // Use relative path as fallback so it works seamlessly on Render
         url: process.env.API_URL || "/",
         description: "API Server",
       },
@@ -201,19 +194,27 @@ const swaggerOptions: Options = {
   ], 
 };
 
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
+
+// Serve the raw JSON spec
 app.get("/swagger.json", (req, res) => {
   res.json(swaggerDocs);
 });
-
-
-
-const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 // Serve the documentation UI
 app.use(
   "/api-docs",
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocs)
+);
+// ==========================================
+
+// CORS — applied AFTER swagger so docs are always accessible
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
 );
 // ==========================================
 

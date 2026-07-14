@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const path_1 = __importDefault(require("path"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
@@ -36,9 +37,9 @@ const swaggerOptions = {
         },
         servers: [
             {
-                // You can use process.env.PORT here if you have one set up
-                url: process.env.API_URL || "http://localhost:3000",
-                description: "Server",
+                // Use relative path as fallback so it works seamlessly on Render
+                url: process.env.API_URL || "/",
+                description: "API Server",
             },
         ],
         components: {
@@ -188,9 +189,10 @@ const swaggerOptions = {
             },
         },
     },
-    apis: process.env.NODE_ENV === "production"
-        ? ["./dist/routes/*.js"]
-        : ["./src/routes/*.ts"]
+    apis: [
+        path_1.default.join(__dirname, "./routes/*.ts"),
+        path_1.default.join(__dirname, "./routes/*.js")
+    ],
 };
 app.get("/swagger.json", (req, res) => {
     res.json(swaggerDocs);
